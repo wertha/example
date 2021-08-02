@@ -1,33 +1,35 @@
 from chubb.datastructures.Nodes import SimpleNode as Node
-from chubb.exceptions import StackOverflowError
-from chubb.exceptions import StackUnderflowError
+from chubb.exceptions import QueueOverflowError
+from chubb.exceptions import QueueUnderflowError
 
 
-class Stack:
+class Queue:
     def __init__(self, size=None):
         self._size = size
-        self._root = None
         self._currentSize = 0
+        self._root = None
+        self._last = None
 
-    def push(self, value):
+    def enqueue(self, value):
         node = Node(value)
         self._currentSize += 1
 
         if self._root is None:
             self._root = node
+            self._last = node
             return
 
         if self._size is not None and self._currentSize > self._size:
-            raise StackOverflowError(
+            raise QueueOverflowError(
                 f'Trying to add {self._currentSize} elements when the limit is {self._size}'
             )
 
-        node.next = self._root
-        self._root = node
+        self._last.next = node
+        self._last = node
 
-    def pop(self):
+    def dequeue(self):
         if self._root is None:
-            raise StackUnderflowError()
+            raise QueueUnderflowError()
 
         result = self._root.value
         self._root = self._root.next
@@ -37,7 +39,7 @@ class Stack:
 
     def __iter__(self):
         while self._root is not None:
-            yield self.pop()
+            yield self.dequeue()
 
     def __str__(self):
         result = ''
